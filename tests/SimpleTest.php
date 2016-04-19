@@ -105,4 +105,13 @@ class SimpleTest extends \phpunit_framework_testcase
         $response = $server->handle($requests->toArray())->getResponses();
         $this->assertEquals([2], $response['responses']);
     }
+
+    /** @expectedException RuntimeException */
+    public function testAddDirectoryException()
+    {
+        $server = new JSONful\Server(__DIR__ . '/apps');
+        $server->handle([]);
+
+        $server->addDirectory(__DIR__);
+    }
 }

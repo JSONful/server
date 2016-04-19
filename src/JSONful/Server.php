@@ -32,10 +32,16 @@ class Server extends Pimple
 
     public function addDirectory($dir)
     {
+        if (!empty($this->functions)) {
+            throw new RuntimeException("You cannot add any directory, the server has booted already. You need to create another server instance");
+        }
         $this->dirs[] = $dir;
         return $this;
     }
 
+    /**
+     *  Initialise the framework, it happens at most once before running routing the framework
+     */
     protected function initialize()
     {
         if (!empty($this->functions)) {
