@@ -1,0 +1,6 @@
+{
+    "request": { "requests": [
+        ["may_fail", []]
+    ] },
+    "response": [ {"error": true, "text": "xxx"} ]
+}

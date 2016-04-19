@@ -1,0 +1,10 @@
+{
+	"request": {"requests": [
+		["is_prime", {"q": 1}],
+		["is_prime", {"q": 2}],
+		["is_prime", {"q": 3}],
+		["is_prime", {"q": 4}],
+		["is_prime", {"q": 5}]
+	]},
+	"response": [true, true, true, false, true]
+}

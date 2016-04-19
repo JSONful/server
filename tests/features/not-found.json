@@ -1,0 +1,4 @@
+{
+    "request": {"requests": [["do_not_exists", []]]},
+    "response": [{"error":  true, "text": "do_not_exists is not a valid function"}]
+}

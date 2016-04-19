@@ -1,0 +1,22 @@
+{
+    "name": "jsonful/server",
+    "description": "JSON server",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Cesar Rodas",
+            "email": "cesar@rodas.me"
+        }
+    ],
+    "autoload": {
+        "psr-0": {
+            "JSONful": "src/"
+        }
+    },
+    "minimum-stability": "stable",
+    "require": {
+        "crodas/function-discovery": "^0.6.1",
+        "pimple/pimple": "^1.0"
+    }
+}
