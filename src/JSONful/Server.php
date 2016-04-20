@@ -183,6 +183,9 @@ class Server extends Pimple
 
             $responses = array();
             foreach ($request['requests'] as $id => $request) {
+                if (is_string($request)) {
+                    $request = [$request, []];
+                }
                 $responses[$id] = $this->processRequest($request[0], $request[1]);
             }
         } catch (RetryException $e) {
