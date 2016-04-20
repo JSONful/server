@@ -186,6 +186,9 @@ class Server extends Pimple
                 if (is_string($request)) {
                     $request = [$request, []];
                 }
+                if (empty($request[1])) {
+                    $request[1] = [];
+                }
                 $responses[$id] = $this->processRequest($request[0], $request[1]);
             }
         } catch (RetryException $e) {
