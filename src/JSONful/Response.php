@@ -16,7 +16,7 @@ class Response
             'Access-Control-Allow-Origin: *',
             'Content-Type: application/json',
             'Access-Control-Allow-Credentials: false',
-            'Access-Control-Allow-Methods: POST',
+            'Access-Control-Allow-Methods: POST, OPTIONS',
             'Access-Control-Allow-Headers: DNT,X-Mx-ReqToken,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Accept-Encoding,Accept,Authorization,Origin',
         );
 
@@ -40,7 +40,7 @@ class Response
 
     public function send()
     {
-        foreach ($this->httpHeades as $header) {
+        foreach ($this->httpHeaders as $header) {
             header($header);
         }
         echo json_encode($this->responses);

@@ -135,6 +135,16 @@ class Server extends Pimple
         return $response;
     }
 
+    public function run()
+    {
+        if ($_SERVER["REQUEST_METHOD"] === 'OPTIONS') {
+            $response = new Response($this, []);
+        } else {
+            $response = $this->handle();
+        }
+        return $response->send();
+    }
+
     public function handle(Array $request = array())
     {
         $this->initialize();
