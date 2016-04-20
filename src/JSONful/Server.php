@@ -21,7 +21,7 @@ class Server extends Pimple
     public function __construct($dirs = null)
     {
         $this->dirs = $dirs ? (Array)$dirs : [];
-        $this['session_storage'] = __NAMESPACE__ . '\ApiServer\Session\Native';
+        $this['session_storage'] = __NAMESPACE__ . '\Session\Native';
         $this['session_id']   = null;
         $this['_has_session'] = false;
         $this['session'] = $this->share(function($service) {
