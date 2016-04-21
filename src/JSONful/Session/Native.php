@@ -20,29 +20,51 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-namespace JSONful\Client;
+namespace JSONful\Session;
 
-class Request
+class Native implements Storage
 {
-    protected $name;
-
-    protected $args;
-
-    protected $response;
-
-    public function __construct($name, $args)
+    public function __construct($id)
     {
-        $this->name = $name;
-        $this->args = $args;
+        ini_set("session.use_cookies", 0);
+        ini_set("session.use_only_cookies", 0);
+        ini_set("session.cache_limiter", "");
+        ini_set('session.gc_maxlifetime', 60 * 60 * 30);
+
+        if ($id) {
+            session_id($id);
+        }
+        session_start();
+        $this->sessionId = session_id();
     }
 
-    public function getName()
+    public function set($name, $value)
     {
-        return $this->name;
+        $_SESSION[$name] = $value;
+        return $this;
+    }
+    
+    public function destroy()
+    {
+        session_destroy();
+        $this->sessionId = null;
     }
 
-    public function getArguments()
+    public function getAll()
     {
-        return $this->args;
+        return $_SESSION;
+    }
+
+    public function get($name)
+    {
+        if (!array_key_exists($name, $_SESSION)) {
+            return null;
+        }
+        return $_SESSION[$name];
+    }
+
+    public function getSessionId()
+    {
+        return $this->sessionId;
     }
 }
