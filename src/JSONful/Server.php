@@ -43,6 +43,7 @@ class Server extends Pimple
         $this->dirs = $dirs ? (Array)$dirs : [];
         $this['session_storage'] = __NAMESPACE__ . '\Session\Native';
         $this['session_id']   = null;
+        $this['public']       = false;
         $this['_has_session'] = false;
         $this['session'] = $this->share(function($service) {
             $service['_has_session'] = true;

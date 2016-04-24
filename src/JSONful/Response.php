@@ -33,7 +33,7 @@ class Response
         $this->server      = $server;
         $this->responses   = $responses; 
         $this->httpHeaders = array(
-            'Access-Control-Allow-Origin: *',
+            'Access-Control-Allow-Origin: ' . $server['public'] ? '*' : $_SERVER['HTTP_HOST'],
             'Content-Type: application/json',
             'Access-Control-Allow-Credentials: false',
             'Access-Control-Allow-Methods: POST, OPTIONS',
