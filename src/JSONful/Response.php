@@ -33,12 +33,18 @@ class Response
         $this->server      = $server;
         $this->responses   = $responses; 
         $this->httpHeaders = array(
-            'Access-Control-Allow-Origin: ' . ($server['public'] || empty($_SERVER['HTTP_HOST']) ? '*' : $_SERVER['HTTP_HOST']),
             'Content-Type: application/json',
             'Access-Control-Allow-Credentials: false',
             'Access-Control-Allow-Methods: POST, OPTIONS',
             'Access-Control-Allow-Headers: DNT,X-Mx-ReqToken,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Accept-Encoding,Accept,Authorization,Origin',
         );
+
+        if ($server['public'] || empty($_SERVER['HTTP_SERVER'])) {
+            $this->httpHeaders[] = 'Access-Control-Allow-Origin: *';
+            $this->httpHeaders[] = 'Access-Control-Max-Age: 86400';
+        } else {
+            $this->httpHeaders[] = 'Access-Control-Allow-Origin: ' . $_SERVER['HTTP_HOST'];
+        }
 
         $keys = array();
         foreach (array_merge($this->httpHeaders, headers_list()) as $header) {
