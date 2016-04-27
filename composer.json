@@ -1,7 +1,7 @@
 {
     "name": "jsonful/server",
     "description": "JSON server",
-    "version": "v0.1.1",
+    "version": "v0.1.2",
     "type": "library",
     "license": "MIT",
     "authors": [
