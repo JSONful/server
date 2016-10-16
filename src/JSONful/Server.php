@@ -51,6 +51,14 @@ class Server extends Pimple
         });
     }
 
+    /**
+     * Add another directory where the framework will be looking for 
+     * functions to export as an API.
+     *
+     * @param String $dir   Directory
+     *
+     * @return Server
+     */
     public function addDirectory($dir)
     {
         if (!empty($this->functions)) {
@@ -75,6 +83,10 @@ class Server extends Pimple
             'initRequest'   => $loader->getFunctions('initRequest'),
             'preRoute'      => $loader->getFunctions('preRoute'),
             'postRoute'     => $loader->getFunctions('postRoute'),
+            'preExec'      => $loader->getFunctions('preExec'),
+            'postExec'     => $loader->getFunctions('postExec'),
+            'preExecute'      => $loader->getFunctions('preExecute'),
+            'postExecute'     => $loader->getFunctions('postExecute'),
             'preResponse'   => $loader->getFunctions('preResponse'),
         );
     }
@@ -82,16 +94,16 @@ class Server extends Pimple
     /**
      *  Run custom initRequest when they have targeted a function name.
      *
-     *  @param string       $handleName     handler name the initRequest is listening to
+     *  @param string       $processName     processr name the initRequest is listening to
      *  @param mixed        &$argument      Arguments  
      *  @param TFunction    $event          Event function object
-     *  @param TFunction    $handler        API call handler
+     *  @param TFunction    $processr        API call processr
      */
-    protected function runInitRequest($handleName, &$argument, TFunction $event, TFunction $handler = null)
+    protected function runInitRequest($processName, &$argument, TFunction $event, TFunction $processr = null)
     {
         $arguments = array();
         foreach ($argument['requests'] as $id => $request) {
-            if ($request[0] === $handleName) {
+            if ($request[0] === $processName) {
                 $arguments[] = &$argument['requests'][$id][1];
             }
         }
@@ -106,17 +118,19 @@ class Server extends Pimple
      *  
      *  @param string       $eventName      Event name to run
      *  @param mixed        &$argument      Arguments  
-     *  @param TFunction    $handler        API call handler
+     *  @param TFunction    $processr        API call processr
      *
      *  @return {crodas\ApiServer\Response}     Response object
      */
-    protected function runEvent($eventName, &$argument, TFunction $handler = null)
+    protected function runEvent($events, &$argument, TFunction $processr = null)
     {
-        foreach ($this->events[$eventName] as $name => $event) {
-            if ($eventName === 'initRequest' && is_string($name) ) {
-                $this->runInitRequest($name, $argument, $event, $handler);
-            } else if (!$handler || (is_numeric($name) || $handler->hasAnnotation($name))) {
-                $event->call(array(&$argument, $this, $handler ? $handler->getAnnotation($name) : null));
+        foreach (explode(",", $events) as $eventName) {
+            foreach ($this->events[$eventName] as $name => $event) {
+                if ($eventName === 'initRequest' && is_string($name) ) {
+                    $this->runInitRequest($name, $argument, $event, $processr);
+                } else if (!$processr || (is_numeric($name) || $processr->hasAnnotation($name))) {
+                    $event->call(array(&$argument, $this, $processr ? $processr->getAnnotation($name) : null));
+                }
             }
         }
     }
@@ -138,35 +152,16 @@ class Server extends Pimple
         return new Response($this, $responses);
     }
 
-    protected function processRequest($name, $args)
-    {
-        if (empty($this->functions[$name])) {
-            return ['error' => true, 'text' => $name . ' is not a valid function'];
-        }
-
-        try {
-            $function = $this->functions[$name];
-            $this->runEvent('preRoute', $args, $function);
-            $response = $function->call(array(&$args, $this));
-            $this->runEvent('postRoute', $response, $function);
-        } catch (Exception $e) {
-            return ['error' => true, 'text' => $e->getMessage()];
-        }
-
-        return $response;
-    }
-
-    public function run()
-    {
-        if ($_SERVER["REQUEST_METHOD"] === 'OPTIONS') {
-            $response = new Response($this, []);
-        } else {
-            $response = $this->handle();
-        }
-        return $response->send();
-    }
-
-    public function handle(Array $request = array())
+    /**
+     * Process the requests. It makes sure the Request is POST and that it 
+     * contains a valid JSON object. It also ensures the format is of the request
+     * is valid. After all the validations it executes all the requests
+     * and return a Response Object.
+     *
+     * @param Array $requests       Request Body
+     * @return JSONful\Response     Response object
+     */
+    protected function process(Array $request = array())
     {
         $this->initialize();
 
@@ -190,7 +185,7 @@ class Server extends Pimple
                 if (empty($request[1])) {
                     $request[1] = [];
                 }
-                $responses[$id] = $this->processRequest($request[0], $request[1]);
+                $responses[$id] = $this->execRequest($request[0], $request[1]);
             }
         } catch (RetryException $e) {
             $responses = self::RETRY_LATER;
@@ -199,6 +194,49 @@ class Server extends Pimple
         }
         
         return $this->send($responses);
+    }
+
+    /**
+     * Executes a request. It will run all the validations (preRoute/postRoute)
+     * and executes the function.
+     *
+     * @param String $name      Function name
+     * @param $args      Function arguments
+     *
+     * @return 
+     */
+    protected function execRequest($name, $args)
+    {
+        if (empty($this->functions[$name])) {
+            return ['error' => true, 'text' => $name . ' is not a valid function'];
+        }
+
+        try {
+            $function = $this->functions[$name];
+            $this->runEvent('preRoute,preExecute,preExec', $args, $function);
+            $response = $function->call(array(&$args, $this));
+            $this->runEvent('postRoute,postExecute,postExec', $response, $function);
+        } catch (Exception $e) {
+            return ['error' => true, 'text' => $e->getMessage()];
+        }
+
+        return $response;
+    }
+
+    /**
+     * Runs the framework
+     *
+     * @param Array $requests       Request Body
+     * @return JSONful\Response     Response object
+     */
+    public function run()
+    {
+        if (!empty($_SERVER["REQUEST_METHOD"]) && $_SERVER["REQUEST_METHOD"] === 'OPTIONS') {
+            $response = new Response($this, []);
+        } else {
+            $response = $this->process();
+        }
+        return $response->send();
     }
 
 }
