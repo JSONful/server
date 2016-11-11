@@ -17,7 +17,7 @@
     },
     "minimum-stability": "stable",
     "require": {
-        "crodas/function-discovery": "^0.6.1",
+        "crodas/function-discovery": ">=0.7.1",
         "pimple/pimple": "^1.0"
     }
 }
