@@ -1,5 +1,11 @@
 <?php
 
+class Server extends JSONful\Server {
+    public function handle(Array $request = []) {
+        return $this->process($request);
+    }
+}
+
 class SimpleTest extends \phpunit_framework_testcase
 {
     public static function requests()
@@ -17,7 +23,7 @@ class SimpleTest extends \phpunit_framework_testcase
      */
     public function testRouting(Array $request, $response)
     {
-        $server = new JSONful\Server(__DIR__ . '/apps');
+        $server = new Server(__DIR__ . '/apps');
         $server['session_storage'] = 'SessionStorage';
         $this->assertEquals($response, $server->handle($request)->getResponses()['responses']);
     }
@@ -27,7 +33,7 @@ class SimpleTest extends \phpunit_framework_testcase
      */
     public function testPreresponse(Array $request, $response)
     {
-        $server = new JSONful\Server(__DIR__ . '/apps');
+        $server = new Server(__DIR__ . '/apps');
         $GLOBALS['encrypt'] = true;
         $response = ['responses' => $response];
         do_encrypt($response);
@@ -53,7 +59,7 @@ class SimpleTest extends \phpunit_framework_testcase
         $requests->add('xxx', []);
 
         /** server instance */
-        $server = new JSONful\Server(__DIR__ . '/apps');
+        $server = new Server(__DIR__ . '/apps');
         $server['session_storage'] = 'SessionStorage';
 
 
@@ -76,7 +82,7 @@ class SimpleTest extends \phpunit_framework_testcase
      */
     public function testSessionFirst()
     {
-        $server = new JSONful\Server(__DIR__ . '/apps');
+        $server = new Server(__DIR__ . '/apps');
         $server['session_storage'] = 'SessionStorage';
 
         $requests = new JSONful\Client\Requests;
@@ -94,7 +100,7 @@ class SimpleTest extends \phpunit_framework_testcase
     public function testSessionSession()
     {
         /** new - server instance */
-        $server = new JSONful\Server;
+        $server = new Server;
         $server->addDirectory(__DIR__ . '/apps');
         $server['session_storage'] = 'SessionStorage';
 
@@ -109,7 +115,7 @@ class SimpleTest extends \phpunit_framework_testcase
     /** @expectedException RuntimeException */
     public function testAddDirectoryException()
     {
-        $server = new JSONful\Server(__DIR__ . '/apps');
+        $server = new Server(__DIR__ . '/apps');
         $server->handle([]);
 
         $server->addDirectory(__DIR__);

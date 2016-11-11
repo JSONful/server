@@ -29,7 +29,8 @@ class Native implements Storage
         ini_set("session.use_cookies", 0);
         ini_set("session.use_only_cookies", 0);
         ini_set("session.cache_limiter", "");
-        ini_set('session.gc_maxlifetime', 60 * 60 * 30);
+        ini_set("session.use_trans_sid", 0);
+        ini_set('session.gc_maxlifetime', 60 * 60 * 24 * 180);
 
         if ($id) {
             session_id($id);
