@@ -19,5 +19,8 @@
     "require": {
         "crodas/function-discovery": ">=0.7.1",
         "pimple/pimple": "^1.0"
+    },
+    "require-dev": {
+        "crodas/phpunit-compat": "^1.1"
     }
 }
