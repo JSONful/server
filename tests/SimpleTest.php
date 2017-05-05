@@ -6,7 +6,9 @@ class Server extends JSONful\Server {
     }
 }
 
-class SimpleTest extends \phpunit_framework_testcase
+use PHPUnit\Framework\TestCase;
+
+class SimpleTest extends TestCase
 {
     public static function requests()
     {
