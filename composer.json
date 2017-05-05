@@ -21,6 +21,6 @@
         "pimple/pimple": "^1.0"
     },
     "require-dev": {
-        "crodas/phpunit-compat": "^1.1"
+        "crodas/phpunit-compat": "^1.7"
     }
 }
